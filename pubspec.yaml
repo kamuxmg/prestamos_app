@@ -1,0 +1,56 @@
+name: prestamos_app
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2 # Mantenemos la versión de SDK que especificaste
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # 📡 Librería para conectarnos a PHP/MySQL vía HTTP
+  # Actualizado a una versión reciente para mejor compatibilidad con Flutter 3+
+  http: ^1.2.1
+  
+  # 🔢 Librería para formatear números y fechas (se necesita para el separador de miles)
+  # ¡Versión actualizada a 0.20.2 para resolver el conflicto con flutter_localizations!
+  intl: ^0.20.2
+
+  # 🌍 Soporte para localización (idiomas)
+  flutter_localizations:
+    sdk: flutter
+
+  # 🔗 NUEVA LIBRERÍA: Para abrir enlaces externos (WhatsApp)
+  url_launcher: ^6.2.2 # Aseguramos una versión reciente para compatibilidad
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  
+  # 🎨 NUEVA DEPENDENCIA: Para generar el icono de la app (App Icon)
+  flutter_launcher_icons: "^0.13.1" # Versión recomendada
+
+# ----------------------------------------------------
+# CONFIGURACIÓN DEL ÍCONO DE LA APLICACIÓN
+# ----------------------------------------------------
+flutter_launcher_icons:
+  android: "launcher_icon" # Nombre del ícono para Android
+  ios: true                # Generar ícono para iOS
+  image_path: "assets/images/logo_prestamos_jv.png" # RUTA DE TU LOGO
+  min_sdk_android: 21      # Mínimo SDK para soporte de iconos adaptativos
+
+# ----------------------------------------------------
+# CONFIGURACIÓN DE ASSETS (IMÁGENES)
+# ----------------------------------------------------
+flutter:
+  uses-material-design: true
+  
+  # Añadimos la sección para que Flutter sepa dónde buscar la imagen del logo
+  assets:
+    - assets/images/

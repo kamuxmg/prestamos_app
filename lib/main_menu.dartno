@@ -1,0 +1,127 @@
+import 'package:flutter/material.dart';
+import 'crear_cliente.dart';
+import 'consulta_clientes.dart'; 
+import 'crear_prestamos.dart'; 
+import 'modificar_cliente.dart'; 
+import 'pagosscreen.dart'; 
+import 'consultapagosscreen.dart'; 
+import 'cartera_clientes.dart'; // <--- ¡REVERTIDO AL NOMBRE CONFIRMADO POR EL USUARIO!
+
+class MainMenu extends StatelessWidget {
+  final String userName;
+  const MainMenu({super.key, required this.userName}); // Línea 12: CORREGIDA
+
+  Widget _tile(BuildContext context, IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.blue),
+      title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+      onTap: onTap,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Panel Principal"),
+        backgroundColor: Colors.blue,
+        elevation: 4,
+        centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
+              ),
+              accountName: Text(userName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              accountEmail: const Text("prestamos_app"),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, size: 40, color: Colors.blue),
+              ),
+            ),
+            _tile(context, Icons.people, "Clientes", () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => CrearClientePage()), 
+              );
+            }),
+            _tile(context, Icons.search, "Consulta Clientes", () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ConsultaClientesPage()),
+              );
+            }),
+            _tile(context, Icons.request_page, "Préstamos", () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => CrearPrestamoPage()),
+              );
+            }),
+            _tile(context, Icons.edit, "Modificar Clientes", () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ModificarClienteForm()),
+              );
+            }),
+            _tile(context, Icons.payment, "Pagos", () {
+              Navigator.pop(context);
+              Navigator.push( 
+                context,
+                MaterialPageRoute(builder: (_) => PagosScreen()),
+              );
+            }),
+            // ENLACE A CARTERA (LÍNEA 85)
+            _tile(context, Icons.account_balance_wallet, "Cartera", () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => CarteraClientesPage()), // EL NOMBRE DE LA CLASE NO CAMBIA
+              );
+            }),
+            
+            // LÓGICA DE NAVEGACIÓN A REPORTES
+            _tile(context, Icons.bar_chart, "Reportes", () {
+              Navigator.pop(context);
+              Navigator.push( 
+                context,
+                MaterialPageRoute(builder: (_) => ConsultaPagosScreen()),
+              );
+            }),
+
+            const Spacer(),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.exit_to_app, color: Colors.red),
+              title: const Text("Cerrar sesión", style: TextStyle(color: Colors.red)),
+              onTap: () {
+                // Vuelve a la ruta inicial (Login)
+                Navigator.pushReplacementNamed(context, '/');
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Bienvenido $userName",
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            const Text("Selecciona una opción en el menú lateral", style: TextStyle(fontSize: 16)),
+          ],
+        ),
+      ),
+    );
+  }
+}
