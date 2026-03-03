@@ -16,23 +16,22 @@ class Config {
   static const String productionBaseUrl = "http://104.167.199.84/prestamos_api";
 
   // Reglas para entornos locales:
-  // - Si estás ejecutando en Android emulator -> 10.0.2.2
-  // - Si estás en Windows/Mac/Linux desktop -> localhost
+  // Se optimizó para evitar excepciones en iOS que disparen el fallback a localhost
   static String get _localBase {
     try {
+      // Solo intentamos detectar Android. Si no lo es, asumimos entorno Desktop/Localhost.
       if (Platform.isAndroid) {
         return "http://10.0.2.2/prestamos_api";
-      } else {
-        // Desktop (Windows/Linux/Mac) usa localhost
-        return "http://localhost/prestamos_api";
       }
+      return "http://localhost/prestamos_api";
     } catch (e) {
-      // Fallback por si Platform falla en alguna plataforma
+      // Si hay error detectando plataforma (común en web o ciertos builds de iOS),
+      // devolvemos localhost como última instancia.
       return "http://localhost/prestamos_api";
     }
   }
 
   /// URL base final que debes usar para construir endpoints:
-  /// e.g. Uri.parse("${Config.apiBase}/crear_cliente.php")
+  /// Si useLocal es false, SIEMPRE devolverá la IP del VPS.
   static String get apiBase => useLocal ? _localBase : productionBaseUrl;
 }

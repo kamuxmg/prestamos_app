@@ -312,7 +312,7 @@ class _ComprobantesDePagoScreenState extends State<ComprobantesDePagoScreen> {
 
     // Formato de WhatsApp
     return '*----------------------------------------*\n'
-        '* PRESTAMOS JV                            *\n'
+        '* INVERSIONES AC                            *\n'
         '*----------------------------------------*\n\n'
         '*¡Hola ${recibo.nombreCliente.split(' ').first}!* 👋\n\n'
         '📄 *COMPROBANTE DE PAGO DE PRÉSTAMO*\n'
