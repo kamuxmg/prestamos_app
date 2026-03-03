@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart'; // Para kDebugMode
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'main_menu.dart';
-
-// 👇 Importamos localizations
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
@@ -18,20 +17,17 @@ class PrestamosApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Prestamos App',
-      debugShowCheckedModeBanner: false, // <- quita la etiqueta DEBUG
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-
-      // 👇 Añadimos soporte de idiomas
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('es', 'ES'), // Español
-        Locale('en', 'US'), // Inglés
+        Locale('es', 'ES'),
+        Locale('en', 'US'),
       ],
-
       initialRoute: '/',
       onGenerateRoute: (settings) {
         if (settings.name == '/main') {
@@ -40,7 +36,6 @@ class PrestamosApp extends StatelessWidget {
             builder: (_) => MainMenu(userName: args ?? 'Usuario'),
           );
         }
-        // default route -> LoginPage
         return MaterialPageRoute(builder: (_) => const LoginPage());
       },
     );
@@ -60,14 +55,26 @@ class _LoginPageState extends State<LoginPage> {
   bool loading = false;
   String message = "";
 
-  // Detecta la base URL según la plataforma:
+  // LÓGICA HÍBRIDA: LOCAL (XAMPP) + VPS
   String getApiBase() {
-    // emulador Android necesita 10.0.2.2; Windows/desktop puede usar localhost
-    if (Platform.isAndroid) {
-      return 'http://10.0.2.2/prestamos_api';
-    } else {
-      return 'http://localhost/prestamos_api';
+    const String vpsIP = '104.167.199.84';
+    
+    // Si estás ejecutando la app desde VS Code (Modo Debug)
+    if (kDebugMode) {
+      if (Platform.isAndroid) {
+        return 'http://10.0.2.2/prestamos_api'; // XAMPP para Emulador Android
+      } else if (Platform.isWindows || Platform.isMacOS) {
+        return 'http://localhost/prestamos_api'; // XAMPP para Desktop
+      } else if (Platform.isIOS) {
+        // OJO: Para iOS local, el iPhone debe estar en la misma red WiFi que tu PC
+        // y aquí deberías poner la IP de tu PC (ej. 192.168.1.50)
+        // Por ahora lo dejamos al VPS para que no te falle el .ipa
+        return 'http://$vpsIP/prestamos_api';
+      }
     }
+
+    // SI LA APP ESTÁ EN PRODUCCIÓN (EL .IPA DE CODEMAGIC)
+    return 'http://$vpsIP/prestamos_api';
   }
 
   Future<void> login() async {
@@ -79,6 +86,9 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final base = getApiBase();
       var url = Uri.parse("$base/login.php");
+      
+      print("Intentando conectar a: $url"); // Para ver en consola a dónde apunta
+
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -86,27 +96,26 @@ class _LoginPageState extends State<LoginPage> {
           "username": userController.text.trim(),
           "password": passController.text,
         }),
-      );
+      ).timeout(const Duration(seconds: 12));
 
       if (response.statusCode != 200) {
         setState(() {
-          message = "Error del servidor: ${response.statusCode}";
+          message = "Error servidor: ${response.statusCode}\nBase: $base";
         });
         return;
       }
 
       var data = jsonDecode(response.body);
       if (data["success"] == true) {
-        // Navega al main con nombre del usuario como argumento
         Navigator.pushReplacementNamed(context, '/main', arguments: data["name"]);
       } else {
         setState(() {
-          message = data["message"] ?? "Usuario o contraseña incorrectos";
+          message = data["message"] ?? "Credenciales incorrectas";
         });
       }
     } catch (e) {
       setState(() {
-        message = "Error de conexión: $e";
+        message = "No se pudo conectar al servidor.\n¿Internet o VPS activo?";
       });
     } finally {
       setState(() {
@@ -118,56 +127,48 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar opcional — si quieres quitarla pon appBar: null
-      appBar: AppBar(title: const Text("Inicio de Sesión")),
+      appBar: AppBar(title: const Text("Acceso al Sistema")),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height - kToolbarHeight - 40,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.account_circle, size: 96, color: Colors.blue),
-              const SizedBox(height: 16),
-              TextField(
-                controller: userController,
-                decoration: const InputDecoration(labelText: "Usuario"),
+        padding: const EdgeInsets.all(25.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 40),
+            const Icon(Icons.account_balance_wallet, size: 80, color: Colors.blue),
+            const SizedBox(height: 20),
+            TextField(
+              controller: userController,
+              decoration: const InputDecoration(
+                labelText: "Nombre de Usuario",
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: "Contraseña"),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: passController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: "Contraseña",
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.lock),
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: loading ? null : login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // botón azul
-                  foregroundColor: Colors.white, // texto blanco
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-                ),
-                child: loading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text("Ingresar", style: TextStyle(fontSize: 16)),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: loading ? null : login,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 55),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              const SizedBox(height: 16),
-              Text(
-                message,
-                style: TextStyle(
-                  color: message.contains("Bienvenido") ? Colors.green : Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              )
-            ],
-          ),
+              child: loading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text("ENTRAR", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            if (message.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.red)),
+            ]
+          ],
         ),
       ),
     );
