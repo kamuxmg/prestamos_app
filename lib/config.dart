@@ -1,4 +1,3 @@
-// lib/config.dart
 import 'dart:io' show Platform;
 
 /// Configuración centralizada de la URL base de la API.
@@ -7,19 +6,18 @@ import 'dart:io' show Platform;
 ///   final base = Config.apiBase;
 class Config {
   // Modo de trabajo:
-  // true  -> desarrollo local (usa las reglas de abajo)
-  // false -> producción (usa productionBaseUrl)
-  // Cambia esto a false cuando muevas tu backend a un hosting/servidor real.
-  static const bool useLocal = true;
+  // true  -> desarrollo local (usa localhost o 10.0.2.2)
+  // false -> producción (usa la IP de tu VPS 104.167.199.84)
+  // CAMBIA A 'false' PARA CONECTAR AL VPS REAL
+  static const bool useLocal = false;
 
-  // Si vas a desplegar en un hosting público, pon aquí la URL completa (con http/https)
-  // Ej: "https://miservidor.com/prestamos_api"
-  static const String productionBaseUrl = "https://TU_DOMINIO_O_IP/public_path/prestamos_api";
+  // URL de tu servidor real (VPS)
+  // Configurada con la IP proporcionada: 104.167.199.84
+  static const String productionBaseUrl = "http://104.167.199.84/prestamos_api";
 
   // Reglas para entornos locales:
   // - Si estás ejecutando en Android emulator -> 10.0.2.2
   // - Si estás en Windows/Mac/Linux desktop -> localhost
-  // - Si quieres probar en un teléfono físico, cambia manualmente productionBaseUrl
   static String get _localBase {
     try {
       if (Platform.isAndroid) {

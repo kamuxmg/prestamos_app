@@ -117,7 +117,7 @@ class _MainMenuState extends State<MainMenu> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Panel Principal"),
+        title: const Text("Inversiones AC"), // Ajuste puntual del título
         backgroundColor: Colors.blue,
         elevation: 4,
         centerTitle: true,
@@ -133,7 +133,7 @@ class _MainMenuState extends State<MainMenu> {
                 end: Alignment.bottomRight), // Degradado de azul
               ),
               accountName: Text(widget.userName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              accountEmail: const Text("Préstamos JV App"),
+              accountEmail: const Text("Inversiones AC"), // Ajuste puntual del texto
               currentAccountPicture: Container( // Se reemplaza CircleAvatar por un Container para el logo
                 decoration: BoxDecoration(
                   color: Colors.white,
